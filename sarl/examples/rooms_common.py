@@ -16,7 +16,7 @@ else:
     EVAL_START = -2
     EVAL_END = 2
     obstacle = None
-PLANNING_ONLY = True
+PLANNING_ONLY = False
 
 if flags['baseline_num'] == 0:
     abstract_graph = grid_params.build_abstract_graph(
