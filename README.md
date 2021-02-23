@@ -70,4 +70,4 @@ To run HIRO-ORIG:
 ```
 tensorboard --logdir {directory}/eval{run_number} & python scripts/local_eval.py {run_number} hiro_orig rooms{2+environment_number} rooms_uvf {directory} & python scripts/local_train.py {run_number} hiro_orig rooms{2+environment_number} rooms_uvf {directory}
 ```
-To run the baseline for ant environments, the command is similar, except replace `rooms{2+environment_number}` with one of the following: `ant_maze`, `ant_push_multi` or `ant_fall_multi`. Also replace `rooms_uvf` with `base_uvf`.
+To run the baseline for ant environments, the command is similar, except replace `rooms{2+environment_number}` with one of the following: `ant_maze`, `ant_push_single` or `ant_fall_single`. Also replace `rooms_uvf` with `base_uvf`.
