@@ -13,6 +13,7 @@ pip install torch torchvision
 pip install IPython
 pip install matplotlib
 pip install opencv-python
+pip install stable_baselines
 ```
 Mujoco physics simulator is required to run ant experiments. Follow instructions [here](https://github.com/openai/mujoco-py) to install it.
 
