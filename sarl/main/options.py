@@ -2,8 +2,6 @@ from sarl.main.value_iteration import value_iteration, print_values, compute_hig
 
 from sarl.main.smdp import SMDP
 from sarl.rl.ars import ARSParams, NNPolicy, ars, NNParams
-from sarl.rl.ddpg.ddpg import DDPG, DDPGParams
-from sarl.rl.ddpg.actorcritic import Actor
 from sarl.rl.agents.td3 import TD3, TD3Params
 from sarl.rl.sb.td3 import TD3 as SB_TD3
 from sarl.rl.sb.util import SB_TD3Params, SBPolicy
@@ -38,7 +36,7 @@ class Option:
         return self.policy.get_action(state)
 
     def cpu(self):
-        if isinstance(self.policy, (Actor, NNPolicy)):
+        if isinstance(self.policy, NNPolicy):
             return Option(self.policy.set_use_cpu(), self.q_start)
         else:
             return self
@@ -282,18 +280,6 @@ def learn_options_with_distributions(abstract_graph,  # abstract_graph : Abstrac
                 policies.append([NNPolicy(nn_params, use_gpu=use_gpu)
                                  for _ in range(len(abstract_graph.graph[q]))])
 
-    # using Pytorch DDPG implementation
-    elif isinstance(rl_params, DDPGParams):
-        if parallel_training == 2:
-            raise RuntimeError("Single policy not supported with DDPG")
-            exit(1)
-        for q in range(N):
-            ddpg_objects.append([DDPG(rl_params, (q, qn), use_gpu=use_gpu)
-                                 for qn in abstract_graph.graph[q]])
-            policies.append([])
-            for ddpg_obj in ddpg_objects[q]:
-                policies[q].append(ddpg_obj.get_policy())
-
     # using StableBaselines TD3 implementation
     elif isinstance(rl_params, SB_TD3Params):
         if parallel_training == 1:
@@ -434,17 +420,6 @@ def learn_options_with_distributions(abstract_graph,  # abstract_graph : Abstrac
                         ars_log = ars(envs[q1][j], policies[q1][j], rl_params, process_id=(q1, q2))
                         num_transitions += ars_log[-1][0]
 
-                elif isinstance(rl_params, DDPGParams):
-                    if parallel_training == 1:
-                        processes[q1].append(Process(target=ddpg_multiprocess,
-                                                     args=(envs[q1][j], ddpg_objects[q1][j],
-                                                           ret_queues[q1][j], req_queues[q1][j])))
-                    else:
-                        ddpg_objects[q1][j].train(envs[q1][j])
-                        num_transitions += ddpg_objects[q1][j].rewardgraph[-1][0]
-                        ddpg_objects[q1][j].rewardgraph = []
-                        policies[q1][j] = ddpg_objects[q1][j].get_policy()
-
                 elif isinstance(rl_params, SB_TD3Params):
                     if parallel_training == 0:
                         ddpg_objects[q1][j].set_env(envs[q1][j])
@@ -511,9 +486,6 @@ def learn_options_with_distributions(abstract_graph,  # abstract_graph : Abstrac
 
                     if isinstance(rl_params, ARSParams):
                         policies[q1][j] = policy_and_steps[0]
-                    elif isinstance(rl_params, DDPGParams):
-                        ddpg_objects[q1][j] = policy_and_steps[0]
-                        policies[q1][j] = ddpg_objects[q1][j].get_policy()
 
                     num_transitions += policy_and_steps[1]
 

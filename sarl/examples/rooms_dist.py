@@ -4,7 +4,6 @@ from sarl.examples.rooms_common import train_env_generator, test_env_generator, 
 from sarl.examples.rooms_envs import GAMMA
 
 from sarl.rl.ars import NNParams, ARSParams
-from sarl.rl.ddpg.ddpg import DDPGParams
 from sarl.rl.agents.td3 import TD3Params
 
 from sarl.main.options import learn_options_with_distributions, DistParams, OptionPolicy
@@ -31,16 +30,6 @@ if flags['alg'] == 'ars':
         rl_params = ARSParams(200, 30, 15, 0.05, 0.3)
     elif flags['parallel'] == 2:
         rl_params = ARSParams(2000, 40, 15, 0.03, 0.03)
-    dist_params = DistParams(200, 30)
-elif flags['alg'] == 'ddpg':
-    rl_params = DDPGParams(obs_dim, action_dim, action_bound,
-                           num_episodes=300,
-                           actor_hidden_dim=50,
-                           critic_hidden_dim=50,
-                           actor_lr=0.0001,
-                           critic_lr=0.001,
-                           buffer_size=200000,
-                           sigma=0.1)
     dist_params = DistParams(200, 30)
 elif flags['alg'] == 'td3' and flags['parallel'] <= 1:
     rl_params = TD3Params(actor_fc_layers=(40, 40),
